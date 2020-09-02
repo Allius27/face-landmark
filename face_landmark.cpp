@@ -1,4 +1,5 @@
 #include <caffe/caffe.hpp>
+#include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -20,17 +21,26 @@ using namespace std;
 using namespace cv;
 using namespace dlib;
 
-int main()
+int main(int argc, const char * argv[])
 {
-    string network = "/Users/CaffeMac/CaffeMac/Models/landmark_deploy.prototxt";
-    string weights = "/Users/CaffeMac/CaffeMac/Models/landmark.caffemodel";
-    string img = "/Users/CaffeMac/CaffeMac/test.jpg";
+    if (argc != 2) {
+        std::cerr << "specify image " << std::endl;
+        exit(2);
+    }
+    string img = argv[1];
+
+
+    string network = "../model/landmark_deploy.prototxt";
+    string weights = "../model/landmark.caffemodel";
+     // = "/Users/CaffeMac/CaffeMac/test.jpg";
+    cout << "point" << endl;
     Net<float> *net = new Net<float>(network,TEST);
     
     net->CopyTrainedLayersFrom(weights);
     
     Caffe::set_mode(Caffe::CPU);
     
+
     Mat image = imread(img);
     
     frontal_face_detector detector = get_frontal_face_detector();
@@ -68,7 +78,7 @@ int main()
         Mat srcROI(image, Rect(tmp.left(),tmp.top(),tmp.right()-tmp.left(),tmp.bottom() - tmp.top()));
         
         Mat img2;
-        cvtColor(srcROI,img2,CV_RGB2GRAY);
+        cvtColor(srcROI,img2, cv::COLOR_RGB2GRAY);
         
         img2.convertTo(img2, CV_32FC1);
         Size dsize = Size(60,60);
